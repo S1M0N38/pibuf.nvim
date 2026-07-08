@@ -2,39 +2,39 @@
 --- Definition file for LuaLS type information. Not loaded at runtime.
 --- See: https://luals.github.io/wiki/definition-files/
 
--- lua/base/init.lua -----------------------------------------------------------
+-- lua/pibuf/init.lua -----------------------------------------------------------
 
----@class Base.Plugin
+---@class Pibuf.Plugin
 ---@field did_setup boolean whether setup() has been called
----@field setup fun(opts?: Base.UserOptions) setup the plugin with user options
+---@field setup fun(opts?: Pibuf.UserOptions) setup the plugin with user options
 ---@field hello fun(): string Say hello to the user using configured name
 ---@field bye fun(): string Say goodbye to the user using configured name
 
--- lua/base/config.lua ---------------------------------------------------------
+-- lua/pibuf/config.lua ---------------------------------------------------------
 
----@class Base.Config
+---@class Pibuf.Config
 ---@field augroup integer augroup created at module load
 ---@field ns integer namespace created at module load
----@field setup fun(opts?: Base.UserOptions) setup the plugin configuration
+---@field setup fun(opts?: Pibuf.UserOptions) setup the plugin configuration
 
----@class Base.UserOptions
+---@class Pibuf.UserOptions
 ---@field name? string The name of the user to greet (optional)
 
----@class Base.DefaultOptions
+---@class Pibuf.DefaultOptions
 ---@field name string The default name of the user to greet
 
----@class Base.Options
+---@class Pibuf.Options
 ---@field name string The name of the user to greet (merged from user/default options)
 
--- lua/base/util.lua -----------------------------------------------------------
+-- lua/pibuf/util.lua -----------------------------------------------------------
 
----@class Base.Util
+---@class Pibuf.Util
 ---@field notify fun(msg: string|table, level?: integer) send notification with plugin title
 ---@field info fun(msg: string) send info notification
 ---@field warn fun(msg: string) send warning notification
 ---@field error fun(msg: string) send error notification
 
--- lua/base/health.lua ---------------------------------------------------------
+-- lua/pibuf/health.lua ---------------------------------------------------------
 
----@class Base.Health
+---@class Pibuf.Health
 ---@field check fun() perform health check for the plugin

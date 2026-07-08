@@ -4,10 +4,10 @@
 
 local sub_cmds = {
   hello = function()
-    require("base").hello()
+    require("pibuf").hello()
   end,
   bye = function()
-    require("base").bye()
+    require("pibuf").bye()
   end,
 }
 
@@ -19,15 +19,15 @@ end
 local function main_cmd(opts)
   local sub_cmd = sub_cmds[opts.args]
   if sub_cmd == nil then
-    vim.notify("Base: invalid subcommand", vim.log.levels.ERROR, { title = "base.nvim" })
+    vim.notify("Pibuf: invalid subcommand", vim.log.levels.ERROR, { title = "pibuf.nvim" })
   else
     sub_cmd()
   end
 end
 
-vim.api.nvim_create_user_command("Base", main_cmd, {
+vim.api.nvim_create_user_command("Pibuf", main_cmd, {
   nargs = "?",
-  desc = "Base example command",
+  desc = "Pibuf example command",
   complete = function(arg_lead, _, _)
     return vim
       .iter(sub_cmds_keys)

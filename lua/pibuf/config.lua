@@ -1,16 +1,16 @@
----@class Base.Config
+---@class Pibuf.Config
 ---@field name string
 local M = {}
 
----@class Base.DefaultOptions
+---@class Pibuf.DefaultOptions
 local defaults = { name = "John Doe" }
 
 -- Access config values directly: Config.name
 local config = vim.deepcopy(defaults)
 
 -- Created at module load — always available
-M.augroup = vim.api.nvim_create_augroup("base", { clear = true })
-M.ns = vim.api.nvim_create_namespace("base")
+M.augroup = vim.api.nvim_create_augroup("pibuf", { clear = true })
+M.ns = vim.api.nvim_create_namespace("pibuf")
 
 setmetatable(M, {
   __index = function(_, key)
@@ -19,13 +19,13 @@ setmetatable(M, {
 })
 
 ---Extend the defaults options table with the user options
----@param opts? Base.UserOptions plugin options
+---@param opts? Pibuf.UserOptions plugin options
 function M.setup(opts)
   config = vim.tbl_deep_extend("force", {}, vim.deepcopy(defaults), opts or {})
 
   -- Validate config
   if type(config.name) ~= "string" then
-    local Util = require("base.util")
+    local Util = require("pibuf.util")
     Util.error(("Invalid 'name' option: expected string, got %s"):format(type(config.name)))
     config.name = defaults.name
   end

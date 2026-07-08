@@ -1,29 +1,29 @@
 ================================================================================
-INTRODUCTION                                                             *base*
+INTRODUCTION                                                             *pibuf*
 
-base.nvim is a template for Neovim plugin development with testing support,
+pibuf.nvim is a template for Neovim plugin development with testing support,
 type definitions, and automated workflows.
 
 Links:
-- Changelog: https://github.com/S1M0N38/base.nvim/blob/main/CHANGELOG.md
-- License (MIT): https://github.com/S1M0N38/base.nvim/blob/main/LICENSE
+- Changelog: https://github.com/S1M0N38/pibuf.nvim/blob/main/CHANGELOG.md
+- License (MIT): https://github.com/S1M0N38/pibuf.nvim/blob/main/LICENSE
 
 Table of contents:
 
-1. FEATURES: What this template provides.                       |base-features|
-2. REQUIREMENTS: Plugin dependencies and setup.             |base-requirements|
-3. INSTALLATION: How to install and use the template.       |base-installation|
-4. CONFIGURATION: Available options and their defaults.           |base-config|
-5. COMMANDS: Commands provided by the template.                 |base-commands|
-6. API: Exposed functions and development interfaces.                |base-api|
-7. DEVELOPMENT: Testing, building, and release workflows.    |base-development|
-8. CI/CD TOKENS: Secrets and tokens for GitHub Actions.       |base-tokens|
-9. TROUBLESHOOTING: Common issues and solutions.         |base-troubleshooting|
+1. FEATURES: What this template provides.                       |pibuf-features|
+2. REQUIREMENTS: Plugin dependencies and setup.             |pibuf-requirements|
+3. INSTALLATION: How to install and use the template.       |pibuf-installation|
+4. CONFIGURATION: Available options and their defaults.           |pibuf-config|
+5. COMMANDS: Commands provided by the template.                 |pibuf-commands|
+6. API: Exposed functions and development interfaces.                |pibuf-api|
+7. DEVELOPMENT: Testing, building, and release workflows.    |pibuf-development|
+8. CI/CD TOKENS: Secrets and tokens for GitHub Actions.       |pibuf-tokens|
+9. TROUBLESHOOTING: Common issues and solutions.         |pibuf-troubleshooting|
 
 ================================================================================
-FEATURES                                                        *base-features*
+FEATURES                                                        *pibuf-features*
 
-base.nvim provides a template with the following features:
+pibuf.nvim provides a template with the following features:
 
 Plugin Structure: ~
 
@@ -32,10 +32,10 @@ Plugin Structure: ~
   provides a proven directory layout that separates concerns and makes your
   plugin easy to navigate for both users and contributors.
 
-  - Organized file layout with lua/base/init.lua for core logic
-  - plugin/base.lua for plugin manager integration
-  - lua/base/health.lua for health check functionality
-  - lua/base/types.lua for LuaCATS type definitions
+  - Organized file layout with lua/pibuf/init.lua for core logic
+  - plugin/pibuf.lua for plugin manager integration
+  - lua/pibuf/health.lua for health check functionality
+  - lua/pibuf/types.lua for LuaCATS type definitions
   - Standard directory structure following Neovim conventions
 
 Development Environment: ~
@@ -86,9 +86,9 @@ Automation and Workflows: ~
   - Minimal reproduction environment for debugging with repro/repro.lua
 
 ================================================================================
-REQUIREMENTS                                                *base-requirements*
+REQUIREMENTS                                                *pibuf-requirements*
 
-Before using base.nvim as a template, ensure you have the following:
+Before using pibuf.nvim as a template, ensure you have the following:
 
 - Neovim ≥ 0.12.2
 - StyLua (https://github.com/JohnnyMorganz/StyLua) for code formatting
@@ -104,15 +104,15 @@ Optional: ~
   configuration during plugin development
 
 ================================================================================
-INSTALLATION                                                *base-installation*
+INSTALLATION                                                *pibuf-installation*
 
-base.nvim is primarily designed as a template for creating new plugins.
+pibuf.nvim is primarily designed as a template for creating new plugins.
 
 Using as a template: ~
 
 1. Click "Use this template" on GitHub to create a new repository
 2. Clone your new repository and customize for your plugin:
-   - Replace "base" with your plugin name throughout the codebase
+   - Replace "pibuf" with your plugin name throughout the codebase
    - Replace "S1M0N38" with your GitHub username
    - Update plugin description and functionality
 Development installation: ~
@@ -142,7 +142,7 @@ For development and testing, install using lazy.nvim:
       ft = "lua",
       opts = {
         library = {
-          "base.nvim",
+          "pibuf.nvim",
         }
       },
     },
@@ -151,11 +151,11 @@ For development and testing, install using lazy.nvim:
 <
 
 ================================================================================
-CONFIGURATION                                                     *base-config*
+CONFIGURATION                                                     *pibuf-config*
 
-base.setup({opts}) ~
+pibuf.setup({opts}) ~
 
-The `base.setup()` function configures the plugin with user-provided options.
+The `pibuf.setup()` function configures the plugin with user-provided options.
 Available options:
 
 >lua
@@ -170,26 +170,26 @@ support your specific configuration needs.
 
 Example configuration: ~
 >lua
-  require("base").setup({
+  require("pibuf").setup({
     name = "Jane Developer",
   })
 <
 
 ================================================================================
-COMMANDS                                                        *base-commands*
+COMMANDS                                                        *pibuf-commands*
 
-base.nvim provides the following commands for demonstration and testing:
+pibuf.nvim provides the following commands for demonstration and testing:
 
-:Base [subcommand] ~
-  Execute a base.nvim subcommand. Available subcommands:
+:Pibuf [subcommand] ~
+  Execute a pibuf.nvim subcommand. Available subcommands:
   - `hello`: Display greeting message to the user
   - `bye`: Display farewell message to the user
 
   If no subcommand is provided or an invalid subcommand is used, an error
   message will be displayed with usage information.
 
-:checkhealth base ~
-  Run health checks to verify base.nvim setup and configuration.
+:checkhealth pibuf ~
+  Run health checks to verify pibuf.nvim setup and configuration.
   This command validates:
   - Plugin installation and loading
   - Configuration option validation
@@ -197,26 +197,26 @@ base.nvim provides the following commands for demonstration and testing:
   - Development dependencies availability
 
 ================================================================================
-API                                                                  *base-api*
+API                                                                  *pibuf-api*
 
-base.nvim exposes a minimal API focused on setup and core functionality:
+pibuf.nvim exposes a minimal API focused on setup and core functionality:
 
-                                                                 *base.setup()*
-base.setup({opts}) ~
-  Set up the plugin with the given options. See |base-config| for
+                                                                 *pibuf.setup()*
+pibuf.setup({opts}) ~
+  Set up the plugin with the given options. See |pibuf-config| for
   available options. This is the primary public function exposed by the
   main module.
 
-                                                                 *base.hello()*
-base.hello() ~
+                                                                 *pibuf.hello()*
+pibuf.hello() ~
   Say hello to the user using the configured name. Returns a string with
   the greeting message and notifies it via `vim.notify()`.
 
   Return format: ~
   "Hello [configured name]"
 
-                                                                   *base.bye()*
-base.bye() ~
+                                                                   *pibuf.bye()*
+pibuf.bye() ~
   Say bye to the user using the configured name. Returns a string with
   the farewell message and notifies it via `vim.notify()`.
 
@@ -226,21 +226,21 @@ base.bye() ~
 Usage example: ~
 >lua
     -- Basic usage
-    require("base").setup({ name = "Developer" })
+    require("pibuf").setup({ name = "Developer" })
 
     -- Call functions directly
-    local greeting = require("base").hello()
-    local farewell = require("base").bye()
+    local greeting = require("pibuf").hello()
+    local farewell = require("pibuf").bye()
 
     -- Access configuration
-    local Config = require("base.config")
+    local Config = require("pibuf.config")
     print("Current name: " .. Config.name)
 <
 
 ================================================================================
-DEVELOPMENT                                                  *base-development*
+DEVELOPMENT                                                  *pibuf-development*
 
-base.nvim includes a development workflow for plugin creation:
+pibuf.nvim includes a development workflow for plugin creation:
 
 Testing: ~
 
@@ -250,17 +250,17 @@ Run tests using mini.test via lazy.minit:
   make test
 
   # Run a single test file
-  make test-one MODULE=base
+  make test-one MODULE=pibuf
 
   # Run explicit file
-  nvim -l tests/minit.lua --minitest tests/base_spec.lua
+  nvim -l tests/minit.lua --minitest tests/pibuf_spec.lua
 <
 
 Health Checks: ~
 
 Validate plugin setup and functionality:
 >vim
-  :checkhealth base
+  :checkhealth pibuf
 <
 
 Minimal Reproduction: ~
@@ -287,7 +287,7 @@ double quotes, 120 column width, Unix line endings).
 
 Generate Help Tags: ~
 
-After modifying `doc/base.txt`, regenerate the tags file:
+After modifying `doc/pibuf.txt`, regenerate the tags file:
 >vim
   :helptags doc/
 <
@@ -314,7 +314,7 @@ A more detailed explanation for conventional commits can be found at
 https://www.conventionalcommits.org/.
 
 ================================================================================
-CI/CD TOKENS                                                    *base-tokens*
+CI/CD TOKENS                                                    *pibuf-tokens*
 
 The CI/CD workflows require the following secrets to be configured in your
 GitHub repository. Navigate to Settings > Secrets and variables > Actions and
@@ -372,19 +372,19 @@ Summary: ~
 <
 
 ================================================================================
-TROUBLESHOOTING                                          *base-troubleshooting*
+TROUBLESHOOTING                                          *pibuf-troubleshooting*
 
 First, run the health check to identify issues:
 >vim
-  :checkhealth base
+  :checkhealth pibuf
 <
 
 If you encounter problems, follow these steps to reproduce the issue
 in a clean environment:
 
-1. Clone base.nvim and cd into the directory
+1. Clone pibuf.nvim and cd into the directory
 2. Run `nvim -u repro/repro.lua`
-3. Run `:checkhealth base`
+3. Run `:checkhealth pibuf`
 4. Try to reproduce the issue
 5. Report the repro.lua and any error messages
 
@@ -399,10 +399,10 @@ script file, i.e.:
 or directly run the command with the `-c` flag:
 >bash
   # Run the command after loading the config in repro/repro.lua file
-  nvim -u repro/repro.lua -c "Base hello"
+  nvim -u repro/repro.lua -c "Pibuf hello"
 
   # Run in headless mode and quit after running the command
-  nvim --headless -u repro/repro.lua -c "Base hello" -c "q"
+  nvim --headless -u repro/repro.lua -c "Pibuf hello" -c "q"
 <
 
 
@@ -410,20 +410,20 @@ Manual Testing: ~
 
 Test basic functionality:
 >vim
-  :Base hello
-  :Base bye
+  :Pibuf hello
+  :Pibuf bye
 <
 
 Test Lua API:
 >vim
-  :lua print(require("base").hello())
-  :lua print(require("base").bye())
+  :lua print(require("pibuf").hello())
+  :lua print(require("pibuf").bye())
 <
 
 Test configuration:
 >vim
-  :lua require("base").setup({name = "Test User"})
-  :lua print(require("base.config").name)
+  :lua require("pibuf").setup({name = "Test User"})
+  :lua print(require("pibuf.config").name)
 <
 
 ================================================================================

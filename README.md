@@ -1,15 +1,15 @@
 <div align="center">
-  <h1>⛶&nbsp;&nbsp;base.nvim&nbsp;&nbsp;⛶ </h1>
+  <h1>⛶&nbsp;&nbsp;pibuf.nvim&nbsp;&nbsp;⛶ </h1>
 
   <p align="center">
-    <a href="https://github.com/S1M0N38/base.nvim/actions/workflows/ci.yml">
-      <img alt="CI badge" src="https://img.shields.io/github/actions/workflow/status/S1M0N38/base.nvim/ci.yml?style=for-the-badge&label=CI"/>
+    <a href="https://github.com/S1M0N38/pibuf.nvim/actions/workflows/ci.yml">
+      <img alt="CI badge" src="https://img.shields.io/github/actions/workflow/status/S1M0N38/pibuf.nvim/ci.yml?style=for-the-badge&label=CI"/>
     </a>
-    <a href="https://luarocks.org/modules/S1M0N38/base.nvim">
-      <img alt="LuaRocks badge" src="https://img.shields.io/luarocks/v/S1M0N38/base.nvim?style=for-the-badge&color=5d2fbf"/>
+    <a href="https://luarocks.org/modules/S1M0N38/pibuf.nvim">
+      <img alt="LuaRocks badge" src="https://img.shields.io/luarocks/v/S1M0N38/pibuf.nvim?style=for-the-badge&color=5d2fbf"/>
     </a>
-    <a href="https://github.com/S1M0N38/base.nvim/releases">
-      <img alt="GitHub badge" src="https://img.shields.io/github/v/release/S1M0N38/base.nvim?style=for-the-badge&label=GitHub"/>
+    <a href="https://github.com/S1M0N38/pibuf.nvim/releases">
+      <img alt="GitHub badge" src="https://img.shields.io/github/v/release/S1M0N38/pibuf.nvim?style=for-the-badge&label=GitHub"/>
     </a>
     <a href="https://www.reddit.com/r/neovim/comments/195q8ai/template_for_writing_neovim_plugin/">
       <img alt="Reddit badge" src="https://img.shields.io/badge/post-reddit?style=for-the-badge&label=Reddit&color=FF5700"/>
@@ -22,9 +22,9 @@ ______________________________________________________________________
 
 ## 💡 Motivation
 
-A minimal Neovim plugin is just a `lua/` directory and a `plugin/` autocommand. But a maintainable one needs tests, docs, types, CI, and a release workflow. base.nvim fills that gap — no framework, no abstraction, just the smallest possible set of opinionated defaults that work.
+A minimal Neovim plugin is just a `lua/` directory and a `plugin/` autocommand. But a maintainable one needs tests, docs, types, CI, and a release workflow. pibuf.nvim fills that gap — no framework, no abstraction, just the smallest possible set of opinionated defaults that work.
 
-Starting a plugin shouldn't mean reinventing project structure and CI pipelines from scratch. base.nvim bundles the conventions used in production plugins so you can focus on writing plugin logic from day one:
+Starting a plugin shouldn't mean reinventing project structure and CI pipelines from scratch. pibuf.nvim bundles the conventions used in production plugins so you can focus on writing plugin logic from day one:
 
 - Proper directory layout following [nvim-best-practices](https://github.com/nvim-neorocks/nvim-best-practices)
 - LuaCATS type annotations with LuaLS checking
@@ -103,7 +103,7 @@ This template ships with [Agent Skills](https://agentskills.io/) in `.agents/ski
 
 ## 🚀 Usage
 
-Get started by reading the comprehensive documentation with [`:help base`](https://github.com/S1M0N38/base.nvim/blob/main/doc/base.txt), which covers all plugin features and configuration options.
+Get started by reading the comprehensive documentation with [`:help pibuf`](https://github.com/S1M0N38/pibuf.nvim/blob/main/doc/pibuf.txt), which covers all plugin features and configuration options.
 
 > [!NOTE]
 > Most Vim/Neovim plugins include built-in `:help` documentation. If you're new to this, start with `:help` to learn the basics.

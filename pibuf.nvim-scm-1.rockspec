@@ -5,12 +5,12 @@ rockspec_format = "3.0"
 version = _MODREV .. _SPECREV
 
 local user = "S1M0N38"
-package = "base.nvim"
+package = "pibuf.nvim"
 
 description = {
 	summary = "Modern template for Neovim plugin development",
 	detailed = [[
-base.nvim is a simple template for Neovim plugin development that provides
+pibuf.nvim is a simple template for Neovim plugin development that provides
 best practices, testing setup, type definitions, and automated workflows.
   ]],
 	labels = { "neovim", "template", "plugin", "lua", "testing", "mini-test" },
