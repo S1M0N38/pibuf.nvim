@@ -8,12 +8,14 @@ local user = "S1M0N38"
 package = "pibuf.nvim"
 
 description = {
-	summary = "Modern template for Neovim plugin development",
+	summary = "A focused prompt-editing mode for the Pi coding agent, activated on Ctrl-G.",
 	detailed = [[
-pibuf.nvim is a simple template for Neovim plugin development that provides
-best practices, testing setup, type definitions, and automated workflows.
+pibuf.nvim auto-activates when the Pi coding agent opens Neovim via Ctrl-G
+and augments the prompt buffer with project-scoped @file completion and
+/skill:* completion, plus syntax highlighting for mentions and a
+distraction-free editing environment.
   ]],
-	labels = { "neovim", "template", "plugin", "lua", "testing", "mini-test" },
+	labels = { "neovim", "plugin", "pi", "prompt", "completion" },
 	homepage = "https://github.com/" .. user .. "/" .. package,
 	license = "MIT",
 }
