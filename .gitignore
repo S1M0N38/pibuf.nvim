@@ -1,0 +1,5 @@
+.repro/
+doc/tags
+.DS_Store
+.tests/
+.nvim-init.md
