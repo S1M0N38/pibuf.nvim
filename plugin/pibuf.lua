@@ -1,43 +1,36 @@
--- In this file you define the User commands, i.e. how the user will interact with your plugin.
--- The require() is inside the callback — the main module is only loaded when the user
--- actually invokes the command (lazy-loading).
+-- pibuf.nvim user commands. The require() is inside the callback so the main
+-- module loads only when a command is actually invoked.
 
-local sub_cmds = {
-  hello = function()
-    require("pibuf").hello()
-  end,
-  bye = function()
-    require("pibuf").bye()
-  end,
+local subcommands = {
+  refresh = {
+    impl = function()
+      require("pibuf").refresh()
+    end,
+    desc = "Refresh the pibuf skill cache",
+  },
 }
 
-local sub_cmds_keys = {}
-for k, _ in pairs(sub_cmds) do
-  table.insert(sub_cmds_keys, k)
-end
+local sub_keys = vim.tbl_keys(subcommands)
 
-local function main_cmd(opts)
-  local sub_cmd = sub_cmds[opts.args]
-  if sub_cmd == nil then
-    vim.notify("Pibuf: invalid subcommand", vim.log.levels.ERROR, { title = "pibuf.nvim" })
-  else
-    sub_cmd()
+vim.api.nvim_create_user_command("Pibuf", function(opts)
+  local sub = subcommands[opts.fargs[1]]
+  if not sub then
+    return vim.notify(
+      "Pibuf: unknown subcommand " .. tostring(opts.fargs[1]),
+      vim.log.levels.ERROR,
+      { title = "pibuf.nvim" }
+    )
   end
-end
-
-vim.api.nvim_create_user_command("Pibuf", main_cmd, {
+  sub.impl()
+end, {
   nargs = "?",
-  desc = "Pibuf example command",
-  complete = function(arg_lead, _, _)
+  desc = "pibuf.nvim",
+  complete = function(arg_lead)
     return vim
-      .iter(sub_cmds_keys)
-      :filter(function(sub_cmd)
-        return sub_cmd:find(arg_lead) ~= nil
+      .iter(sub_keys)
+      :filter(function(k)
+        return k:find(arg_lead, 1, true) ~= nil
       end)
       :totable()
   end,
 })
-
--- RESOURCES:
---  - :help nvim_create_user_command()
---  - https://github.com/lumen-oss/nvim-best-practices?tab=readme-ov-file#speaking_head-user-commands
