@@ -1,11 +1,18 @@
 ================================================================================
 INTRODUCTION                                                      *pibuf*
 
-pibuf.nvim — A focused prompt-editing mode for the Pi coding agent,
-activated on Ctrl-G.
+pibuf.nvim — Completion and editing niceties for the buffer the Pi coding
+agent opens with `Ctrl-G`.
 
-<!-- TODO: Add a brief introduction to your plugin. Explain what it does
-and link to relevant resources. -->
+When you press `Ctrl-G` in Pi, it writes your prompt to a temp file and opens
+it in `$VISUAL`. pibuf.nvim detects that buffer (filetype `pi`) and adds:
+  • `@file` completion — reference project files by relative path.
+  • `/skill:<name>` completion — invoke an installed Pi skill.
+  • Syntax highlighting for `@file` and `/skill:` tokens.
+  • A winbar hint and an unsaved-changes guard.
+
+Completion is powered by a blink.cmp source; pibuf does the candidate
+generation, blink does the fuzzy filtering.
 
 Links:
 - Changelog: https://github.com/S1M0N38/pibuf.nvim/blob/main/CHANGELOG.md
@@ -18,52 +25,122 @@ Table of contents:
 3. INSTALLATION: How to install the plugin.               |pibuf-installation|
 4. CONFIGURATION: Available options and their defaults.          |pibuf-config|
 5. COMMANDS: Commands provided by the plugin.                  |pibuf-commands|
-6. API: Exposed functions and development interfaces.             |pibuf-api|
+6. USAGE: Editing Pi prompts.                                      |pibuf-usage|
 
 ================================================================================
 FEATURES                                                        *pibuf-features*
 
-<!-- TODO: Describe the main features of your plugin. -->
+`@file` mentions ~
+Type `@` to complete project file paths relative to the project root.
+  • `@<Enter>` lists top-level entries (directories first).
+  • `@src/<Enter>` lists entries in `src/`.
+  • `@<word>` (no slash) does a project-wide search for paths containing
+    `<word>` (capped). Directories complete with a trailing `/`.
+The project root is snapshotted when the Pi buffer opens, so `:cd` mid-session
+does not change which files are offered.
+
+`/skill:<name>` references ~
+Type `/` to complete installed Pi skills. A skill from any of Pi's sources is
+offered as `/skill:<name>` with its description shown inline. Skills are cached
+per project and refreshed when a Pi buffer is opened or via |:Pibuf|.
+
+Syntax ~
+`@file` mentions and `/skill:` references are highlighted (linked to
+`Identifier` and `Function` by default; override `pibufFileRef` /
+`pibufSkill`).
+
+Lifecycle ~
+Pi's contract is unchanged: `:wq`/`ZZ` save and send, `:cq` cancels. A winbar
+hint reminds you of this, and a guard warns if you close the buffer with
+unsaved changes.
 
 ================================================================================
 REQUIREMENTS                                                *pibuf-requirements*
 
-<!-- TODO: List the requirements for your plugin (Neovim version, external
-tools, etc.). -->
+  • Neovim >= 0.12
+  • blink.cmp (completion engine; pibuf registers a source)
+  • `fd` (optional but recommended — fast `@file` search; vim.fs fallback
+    otherwise, flagged by `:checkhealth pibuf`)
+  • Pi itself, with `$VISUAL` pointing at your Neovim. For example: >
+        export VISUAL="env NVIM_APPNAME=lazyvim nvim"
+<
 
 ================================================================================
 INSTALLATION                                                *pibuf-installation*
 
-Install with lazy.nvim: ~
-
->lua
-  {
-    "S1M0N38/pibuf.nvim",
-    lazy = false,
-    opts = {},
-  }
+Install with lazy.nvim, and register pibuf as a blink.cmp source for the `pi`
+filetype: >
+>
+    {
+      "S1M0N38/pibuf.nvim",
+      opts = {},
+    },
+    {
+      "saghen/blink.cmp",
+      opts = {
+        sources = {
+          per_filetype = { pi = { "pibuf" } },
+          providers = {
+            pibuf = { name = "Pibuf", module = "pibuf.source" },
+          },
+        },
+      },
+    },
 <
+`per_filetype = { pi = { "pibuf" } }` makes pibuf the only source in Pi
+buffers (no LSP/buffer noise). The source also gates itself on
+`filetype == "pi"`.
 
 ================================================================================
 CONFIGURATION                                                     *pibuf-config*
 
-<!-- TODO: Document the available configuration options. -->
-
 >lua
-  require("pibuf").setup({
-    -- add options here
-  })
+    require("pibuf").setup({
+      files = { max_results = 50 },          -- project-wide @file search cap
+      skills = {
+        extra_paths = {},                    -- extra dirs to scan for skills
+        manifest = "PI_SKILLS_MANIFEST",     -- env var for a skills manifest
+      },                                     -- (forward-compat; nil by default)
+      winbar = { enabled = true },           -- show the send/cancel hint
+      guard = { unwritten = true },          -- warn on unsaved close
+    })
 <
+
+`files.max_results`      (integer, default 50)
+    Cap for the project-wide `@<word>` search. Directory listings are not
+    capped by this.
+
+`skills.extra_paths`     (string[], default {})
+    Additional directories to scan for `SKILL.md` files.
+
+`skills.manifest`        (string?, default "PI_SKILLS_MANIFEST")
+    Name of an environment variable pointing at a JSON skills manifest. If set
+    and readable, its skills are preferred over the filesystem scan (a
+    forward-compat seam for a future Pi extension; unset by default).
+
+`winbar.enabled`         (boolean, default true)
+    Show "save & quit to send · :cq to cancel" in the winbar.
+
+`guard.unwritten`        (boolean, default true)
+    Warn when a modified Pi buffer is closed without writing.
 
 ================================================================================
 COMMANDS                                                        *pibuf-commands*
 
-<!-- TODO: Document commands provided by the plugin, if any. -->
+                                                      *:Pibuf*
+:Pibuf refresh        Refresh the skill cache for the current project.
 
 ================================================================================
-API                                                                  *pibuf-api*
+USAGE                                                              *pibuf-usage*
 
-<!-- TODO: Document the public Lua API. -->
+1. Press `Ctrl-G` in Pi. Pi writes your prompt to a temp file and opens it in
+   Neovim; pibuf sets the filetype to `pi`.
+2. Edit the prompt:
+   • Type `@` to insert a file mention, narrowing with the keyboard.
+   • Type `/` to insert a skill reference.
+3. Send the edited prompt back to Pi by saving and quitting (`:wq` or `ZZ`,
+   exit code 0). To discard and keep the original prompt, use `:cq`
+   (exit code non-zero).
 
 ================================================================================
 vim:tw=78:ts=8:et:ft=help:norl:
