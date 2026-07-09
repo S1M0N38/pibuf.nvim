@@ -28,8 +28,11 @@ end
 local function snacks_picker()
   local ok, SnacksPicker = pcall(require, "snacks.picker")
   if not ok then
-    vim.notify("pibuf needs snacks.nvim for its picker. Install folke/snacks.nvim.",
-      vim.log.levels.ERROR, { title = "pibuf.nvim" })
+    vim.notify(
+      "pibuf needs snacks.nvim for its picker. Install folke/snacks.nvim.",
+      vim.log.levels.ERROR,
+      { title = "pibuf.nvim" }
+    )
   end
   return SnacksPicker
 end
