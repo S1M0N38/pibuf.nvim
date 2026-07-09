@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>⛶&nbsp;&nbsp;pibuf.nvim&nbsp;&nbsp;⛶ </h1>
+  <h1>≡&nbsp;&nbsp;pibuf.nvim&nbsp;&nbsp;≡</h1>
 
   <p align="center">
     <a href="https://github.com/S1M0N38/pibuf.nvim/actions/workflows/ci.yml">
@@ -12,7 +12,7 @@
       <img alt="GitHub badge" src="https://img.shields.io/github/v/release/S1M0N38/pibuf.nvim?style=for-the-badge&label=GitHub"/>
     </a>
   </p>
-  <p><em>Picker-backed prompt editing for the Pi coding agent, activated on Ctrl-G.</em></p>
+  <p><em>Mininal nvim config for Pi agent Ctrl-G</em></p>
 </div>
 
 ______________________________________________________________________
@@ -33,7 +33,7 @@ Pickers are powered by [snacks.nvim](https://github.com/folke/snacks.nvim).
 - Neovim >= 0.12
 - [snacks.nvim](https://github.com/folke/snacks.nvim)
 - Pi, with `$VISUAL` pointing at Neovim, e.g.
-  `export VISUAL="env NVIM_APPNAME=lazyvim nvim"`
+  `export VISUAL="env NVIM_APPNAME=nvim nvim"`
 
 ## 📦 Installation
 

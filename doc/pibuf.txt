@@ -53,7 +53,7 @@ REQUIREMENTS                                                *pibuf-requirements*
 - The Pi coding agent (https://github.com/earendil-works/pi-coding-agent),
   with `$VISUAL` pointing at this Neovim. For example: >
 
-        export VISUAL="env NVIM_APPNAME=lazyvim nvim"
+        export VISUAL="env NVIM_APPNAME=nvim nvim"
 <
 
 ================================================================================
@@ -200,7 +200,7 @@ Pickers do nothing, or error about snacks.nvim ~
 - Confirm the buffer filetype is `pi` (`:set ft?`). pibuf only activates on
   `pi` buffers.
 - Make sure `$VISUAL` points at this Neovim, e.g.
-  `export VISUAL="env NVIM_APPNAME=lazyvim nvim"`.
+  `export VISUAL="env NVIM_APPNAME=nvim nvim"`.
 
 The skills picker is empty ~
 - Skills are read from `SKILL.md` files with a frontmatter `description`.
