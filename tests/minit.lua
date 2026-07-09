@@ -11,6 +11,6 @@ end
 
 require("lazy.minit").setup({
   spec = {
-    { dir = vim.uv.cwd(), opts = {} },
+    { dir = vim.uv.cwd() },
   },
 })

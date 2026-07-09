@@ -1,18 +1,16 @@
 ================================================================================
 INTRODUCTION                                                      *pibuf*
 
-pibuf.nvim — Completion and editing niceties for the buffer the Pi coding
-agent opens with `Ctrl-G`.
+pibuf.nvim — Picker-backed prompt editing for the buffer the Pi coding agent
+opens with `Ctrl-G`.
 
 When you press `Ctrl-G` in Pi, it writes your prompt to a temp file and opens
-it in `$VISUAL`. pibuf.nvim detects that buffer (filetype `pi`) and adds:
-  • `@file` completion — reference project files by relative path.
-  • `/skill:<name>` completion — invoke an installed Pi skill.
-  • Syntax highlighting for `@file` and `/skill:` tokens.
-  • A winbar hint and an unsaved-changes guard.
+it in `$VISUAL`. pibuf.nvim detects that buffer (filetype `pi`) and adds two
+buffer-local pickers:
+  • `<C-f>` — pick a project file; insert an `@<path>` mention.
+  • `<C-s>` — pick an installed Pi skill; insert a `/skill:<name>` reference.
 
-Completion is powered by a blink.cmp source; pibuf does the candidate
-generation, blink does the fuzzy filtering.
+Pickers are powered by snacks.nvim.
 
 Links:
 - Changelog: https://github.com/S1M0N38/pibuf.nvim/blob/main/CHANGELOG.md
@@ -23,44 +21,27 @@ Table of contents:
 1. FEATURES: What this plugin provides.                       |pibuf-features|
 2. REQUIREMENTS: Plugin dependencies and setup.           |pibuf-requirements|
 3. INSTALLATION: How to install the plugin.               |pibuf-installation|
-4. CONFIGURATION: Available options and their defaults.          |pibuf-config|
-5. COMMANDS: Commands provided by the plugin.                  |pibuf-commands|
-6. USAGE: Editing Pi prompts.                                      |pibuf-usage|
+4. USAGE: Editing Pi prompts.                                      |pibuf-usage|
 
 ================================================================================
 FEATURES                                                        *pibuf-features*
 
-`@file` mentions ~
-Type `@` to complete project file paths relative to the project root.
-  • `@<Enter>` lists top-level entries (directories first).
-  • `@src/<Enter>` lists entries in `src/`.
-  • `@<word>` (no slash) does a project-wide search for paths containing
-    `<word>` (capped). Directories complete with a trailing `/`.
-The project root is snapshotted when the Pi buffer opens, so `:cd` mid-session
-does not change which files are offered.
+`<C-f>`  file mentions ~
+Opens a snacks.nvim file picker scoped to the current working directory.
+Confirming an item inserts `@<relpath>` at the cursor.
 
-`/skill:<name>` references ~
-Type `/` to complete installed Pi skills. A skill from any of Pi's sources is
-offered as `/skill:<name>` with its description shown inline. Skills are cached
-per project and refreshed when a Pi buffer is opened or via |:Pibuf|.
+`<C-s>`  skill references ~
+Opens a skills picker built from pibuf's scan of Pi's skill sources
+(user-global, project, config-dir, and package sources). Confirming a skill
+inserts `/skill:<name>` at the cursor.
 
-Syntax ~
-`@file` mentions and `/skill:` references are highlighted (linked to
-`Identifier` and `Function` by default; override `pibufFileRef` /
-`pibufSkill`).
-
-Lifecycle ~
-Pi's contract is unchanged: `:wq`/`ZZ` save and send, `:cq` cancels. A winbar
-hint reminds you of this, and a guard warns if you close the buffer with
-unsaved changes.
+Both keymaps are buffer-local and only active in `pi` buffers.
 
 ================================================================================
 REQUIREMENTS                                                *pibuf-requirements*
 
   • Neovim >= 0.12
-  • blink.cmp (completion engine; pibuf registers a source)
-  • `fd` (optional but recommended — fast `@file` search; vim.fs fallback
-    otherwise, flagged by `:checkhealth pibuf`)
+  • snacks.nvim (powers the file and skills pickers)
   • Pi itself, with `$VISUAL` pointing at your Neovim. For example: >
         export VISUAL="env NVIM_APPNAME=lazyvim nvim"
 <
@@ -68,67 +49,15 @@ REQUIREMENTS                                                *pibuf-requirements*
 ================================================================================
 INSTALLATION                                                *pibuf-installation*
 
-Install with lazy.nvim, and register pibuf as a blink.cmp source for the `pi`
-filetype: >
+Install with lazy.nvim: >
 >
     {
       "S1M0N38/pibuf.nvim",
-      opts = {},
-    },
-    {
-      "saghen/blink.cmp",
-      opts = {
-        sources = {
-          per_filetype = { pi = { "pibuf" } },
-          providers = {
-            pibuf = { name = "Pibuf", module = "pibuf.source" },
-          },
-        },
-      },
-    },
+      dependencies = { "folke/snacks.nvim" },
+    }
 <
-`per_filetype = { pi = { "pibuf" } }` makes pibuf the only source in Pi
-buffers (no LSP/buffer noise). The source also gates itself on
-`filetype == "pi"`.
-
-================================================================================
-CONFIGURATION                                                     *pibuf-config*
-
->lua
-    require("pibuf").setup({
-      files = { max_results = 50 },          -- project-wide @file search cap
-      skills = {
-        extra_paths = {},                    -- extra dirs to scan for skills
-        manifest = "PI_SKILLS_MANIFEST",     -- env var for a skills manifest
-      },                                     -- (forward-compat; nil by default)
-      winbar = { enabled = true },           -- show the send/cancel hint
-      guard = { unwritten = true },          -- warn on unsaved close
-    })
-<
-
-`files.max_results`      (integer, default 50)
-    Cap for the project-wide `@<word>` search. Directory listings are not
-    capped by this.
-
-`skills.extra_paths`     (string[], default {})
-    Additional directories to scan for `SKILL.md` files.
-
-`skills.manifest`        (string?, default "PI_SKILLS_MANIFEST")
-    Name of an environment variable pointing at a JSON skills manifest. If set
-    and readable, its skills are preferred over the filesystem scan (a
-    forward-compat seam for a future Pi extension; unset by default).
-
-`winbar.enabled`         (boolean, default true)
-    Show "save & quit to send · :cq to cancel" in the winbar.
-
-`guard.unwritten`        (boolean, default true)
-    Warn when a modified Pi buffer is closed without writing.
-
-================================================================================
-COMMANDS                                                        *pibuf-commands*
-
-                                                      *:Pibuf*
-:Pibuf refresh        Refresh the skill cache for the current project.
+No extra setup is needed — pibuf activates on the `pi` filetype and registers
+the `<C-f>` / `<C-s>` keymaps automatically.
 
 ================================================================================
 USAGE                                                              *pibuf-usage*
@@ -136,8 +65,8 @@ USAGE                                                              *pibuf-usage*
 1. Press `Ctrl-G` in Pi. Pi writes your prompt to a temp file and opens it in
    Neovim; pibuf sets the filetype to `pi`.
 2. Edit the prompt:
-   • Type `@` to insert a file mention, narrowing with the keyboard.
-   • Type `/` to insert a skill reference.
+   • Press `<C-f>` to open the file picker and insert an `@<path>` mention.
+   • Press `<C-s>` to open the skills picker and insert a `/skill:<name>`.
 3. Send the edited prompt back to Pi by saving and quitting (`:wq` or `ZZ`,
    exit code 0). To discard and keep the original prompt, use `:cq`
    (exit code non-zero).

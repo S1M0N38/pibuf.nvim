@@ -8,14 +8,15 @@ local user = "S1M0N38"
 package = "pibuf.nvim"
 
 description = {
-	summary = "A focused prompt-editing mode for the Pi coding agent, activated on Ctrl-G.",
+	summary = "Picker-backed prompt editing for the Pi coding agent, activated on Ctrl-G.",
 	detailed = [[
 pibuf.nvim auto-activates when the Pi coding agent opens Neovim via Ctrl-G
-and augments the prompt buffer with project-scoped @file completion and
-/skill:* completion, plus syntax highlighting for mentions and a
-distraction-free editing environment.
+and adds two buffer-local pickers to the prompt buffer: <C-f> inserts an
+@<path> file mention via a snacks.nvim file picker, and <C-s> inserts a
+/skill:<name> reference via a skills picker built from a scan of Pi's skill
+sources.
   ]],
-	labels = { "neovim", "plugin", "pi", "prompt", "completion" },
+	labels = { "neovim", "plugin", "pi", "prompt", "picker" },
 	homepage = "https://github.com/" .. user .. "/" .. package,
 	license = "MIT",
 }

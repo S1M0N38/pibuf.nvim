@@ -1,7 +1,6 @@
 ---@module 'luassert'
 
 local skills = require("pibuf.skills")
-local config = require("pibuf.config")
 
 local tmp ---@type string temp skills root, recreated per test
 
@@ -12,7 +11,6 @@ end)
 
 after_each(function()
   vim.fn.delete(tmp, "rf")
-  vim.env.PI_SKILLS_MANIFEST = nil
 end)
 
 local function write(path, content)
@@ -119,72 +117,5 @@ describe("skills.discover", function()
       end
     end
     assert.is_true(found)
-  end)
-
-  it("prefers a manifest over the filesystem scan", function()
-    local manifest = tmp .. "/manifest.json"
-    vim.fn.writefile({
-      '{"skills":[{"name":"frommanifest","description":"manifest skill"}]}',
-    }, manifest)
-    vim.env.PI_SKILLS_MANIFEST = manifest
-    write(tmp .. "/.agents/skills/scanned/SKILL.md", "---\nname: scanned\ndescription: scanned skill\n---")
-    local got = skills.discover(tmp)
-    assert.are.equal(1, #got)
-    assert.are.equal("frommanifest", got[1].name)
-  end)
-end)
-
-describe("skills.consume_manifest", function()
-  it("returns nil when env is unset", function()
-    vim.env.PI_SKILLS_MANIFEST = nil
-    assert.is_nil(skills.consume_manifest())
-  end)
-
-  it("returns nil for an unreadable path", function()
-    vim.env.PI_SKILLS_MANIFEST = tmp .. "/missing.json"
-    assert.is_nil(skills.consume_manifest())
-  end)
-
-  it("parses a {skills={...}} manifest", function()
-    local manifest = tmp .. "/manifest.json"
-    vim.fn.writefile({
-      '{"skills":[' .. '{"name":"a","description":"alpha"},' .. '{"name":"b","description":"beta"}' .. "]}",
-    }, manifest)
-    vim.env.PI_SKILLS_MANIFEST = manifest
-    local got = skills.consume_manifest()
-    assert.are.equal(2, #got)
-    assert.are.equal("a", got[1].name)
-  end)
-
-  it("parses a bare-list manifest", function()
-    local manifest = tmp .. "/manifest.json"
-    vim.fn.writefile({
-      '[{"name":"x","description":"ex"}]',
-    }, manifest)
-    vim.env.PI_SKILLS_MANIFEST = manifest
-    local got = skills.consume_manifest()
-    assert.are.equal(1, #got)
-    assert.are.equal("x", got[1].name)
-  end)
-end)
-
-describe("skills cache", function()
-  it("refresh invalidates the cache", function()
-    config.setup({}) -- ensure defaults
-    skills.refresh()
-    local first = skills.get(0)
-    write(tmp .. "/.agents/skills/late/SKILL.md", "---\nname: late\ndescription: added later\n---")
-    -- configure cwd to tmp via buffer-local
-    vim.b[0].pibuf_cwd = tmp
-    skills.refresh(0)
-    local second = skills.get(0)
-    local found = false
-    for _, s in ipairs(second) do
-      if s.name == "late" then
-        found = true
-      end
-    end
-    assert.is_true(found)
-    assert.are_not.equal(first, second) -- cache rebuilt
   end)
 end)
