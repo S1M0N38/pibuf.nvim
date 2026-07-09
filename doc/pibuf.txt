@@ -1,75 +1,210 @@
 ================================================================================
-INTRODUCTION                                                      *pibuf*
+INTRODUCTION                                                             *pibuf*
 
 pibuf.nvim — Picker-backed prompt editing for the buffer the Pi coding agent
 opens with `Ctrl-G`.
 
-When you press `Ctrl-G` in Pi, it writes your prompt to a temp file and opens
-it in `$VISUAL`. pibuf.nvim detects that buffer (filetype `pi`) and adds two
-buffer-local pickers:
-  • `<C-f>` — pick a project file; insert an `@<path>` mention.
-  • `<C-s>` — pick an installed Pi skill; insert a `/skill:<name>` reference.
+When you press `Ctrl-G` in the Pi coding agent
+(https://github.com/earendil-works/pi-coding-agent), Pi writes your prompt to
+a temp file and opens it in `$VISUAL`. pibuf.nvim detects that buffer
+(filetype `pi`) and adds two buffer-local pickers powered by snacks.nvim
+(https://github.com/folke/snacks.nvim):
 
-Pickers are powered by snacks.nvim.
+- `<C-f>` — pick a project file; insert an `@<path>` mention.
+- `<C-s>` — pick an installed Pi skill; insert a `/skill:<name>` reference.
+
+pibuf places the cursor at the end of the prompt and enters insert mode, so
+you can start typing right away.
 
 Links:
-- Changelog: https://github.com/S1M0N38/pibuf.nvim/blob/main/CHANGELOG.md
+- Source: https://github.com/S1M0N38/pibuf.nvim
+- Releases: https://github.com/S1M0N38/pibuf.nvim/releases
 - License (MIT): https://github.com/S1M0N38/pibuf.nvim/blob/main/LICENSE
 
 Table of contents:
 
-1. FEATURES: What this plugin provides.                       |pibuf-features|
-2. REQUIREMENTS: Plugin dependencies and setup.           |pibuf-requirements|
-3. INSTALLATION: How to install the plugin.               |pibuf-installation|
+1. FEATURES: What this plugin provides.                         |pibuf-features|
+2. REQUIREMENTS: Plugin dependencies and setup.             |pibuf-requirements|
+3. INSTALLATION: How to install the plugin.                 |pibuf-installation|
 4. USAGE: Editing Pi prompts.                                      |pibuf-usage|
+5. KEYMAPS: Buffer-local keymaps in pi bu  ffers.                |pibuf-keymaps|
+6. HIGHLIGHTS: Syntax highlight groups.                       |pibuf-highlights|
+7. API: Public Lua functions.                                        |pibuf-api|
+8. TROUBLESHOOTING: Diagnosing problems.                 |pibuf-troubleshooting|
 
 ================================================================================
 FEATURES                                                        *pibuf-features*
 
-`<C-f>`  file mentions ~
-Opens a snacks.nvim file picker scoped to the current working directory.
-Confirming an item inserts `@<relpath>` at the cursor.
-
-`<C-s>`  skill references ~
-Opens a skills picker built from pibuf's scan of Pi's skill sources
-(user-global, project, config-dir, and package sources). Confirming a skill
-inserts `/skill:<name>` at the cursor.
-
-Both keymaps are buffer-local and only active in `pi` buffers.
+- File mentions: a `<C-f>` picker (snacks.nvim) scoped to the current working
+  directory inserts `@<relpath>` at the cursor.
+- Skill references: a `<C-s>` picker built from a fresh scan of Pi's skill
+  sources inserts `/skill:<name>` at the cursor.
+- Zero configuration: pibuf activates on the `pi` filetype and registers its
+  keymaps automatically — no options, no manual `setup()` call needed.
+- Highlights: the `pi` filetype gets syntax highlighting for `@<path>` and
+  `/skill:<name>` tokens (see |pibuf-highlights|).
 
 ================================================================================
 REQUIREMENTS                                                *pibuf-requirements*
 
-  • Neovim >= 0.12
-  • snacks.nvim (powers the file and skills pickers)
-  • Pi itself, with `$VISUAL` pointing at your Neovim. For example: >
+- Neovim >= 0.12
+- snacks.nvim (https://github.com/folke/snacks.nvim) — powers the file and
+  skills pickers.
+- The Pi coding agent (https://github.com/earendil-works/pi-coding-agent),
+  with `$VISUAL` pointing at this Neovim. For example: >
+
         export VISUAL="env NVIM_APPNAME=lazyvim nvim"
 <
 
 ================================================================================
 INSTALLATION                                                *pibuf-installation*
 
-Install with lazy.nvim: >
->
-    {
-      "S1M0N38/pibuf.nvim",
-      dependencies = { "folke/snacks.nvim" },
-    }
+Install with lazy.nvim (https://github.com/folke/lazy.nvim):
+
+>lua
+  {
+    "S1M0N38/pibuf.nvim",
+    dependencies = { "folke/snacks.nvim" },
+    opts = {},
+  }
 <
-No extra setup is needed — pibuf activates on the `pi` filetype and registers
-the `<C-f>` / `<C-s>` keymaps automatically.
+
+- `S1M0N38/pibuf.nvim`: the plugin's GitHub repository.
+- `dependencies`: `folke/snacks.nvim` powers the pickers (see
+  |pibuf-requirements|).
+
+pibuf has no options of its own. The empty `opts = {}` above just tells
+lazy.nvim to auto-call `require("pibuf").setup()`, which registers the
+autocmds that detect `pi` buffers; see |pibuf.setup()|. No manual `setup()`
+call is required.
 
 ================================================================================
 USAGE                                                              *pibuf-usage*
 
 1. Press `Ctrl-G` in Pi. Pi writes your prompt to a temp file and opens it in
-   Neovim; pibuf sets the filetype to `pi`.
+   Neovim; pibuf sets the filetype to `pi`, jumps to the end of the prompt,
+   and starts insert mode.
 2. Edit the prompt:
-   • Press `<C-f>` to open the file picker and insert an `@<path>` mention.
-   • Press `<C-s>` to open the skills picker and insert a `/skill:<name>`.
+   - Press `<C-f>` to open the file picker and insert an `@<path>` mention.
+   - Press `<C-s>` to open the skills picker and insert a `/skill:<name>`.
 3. Send the edited prompt back to Pi by saving and quitting (`:wq` or `ZZ`,
-   exit code 0). To discard and keep the original prompt, use `:cq`
-   (exit code non-zero).
+   exit code 0). To discard your edits and keep the original prompt, use
+   `:cq` (exit code non-zero).
+
+================================================================================
+KEYMAPS                                                          *pibuf-keymaps*
+
+Both keymaps are buffer-local: they are set only in `pi` buffers and never
+shadow your global mappings. They are active in Normal and Insert mode.
+
+Default keymaps: ~
+
+  `<C-f>`  Open the file picker; on confirm insert `@<relpath>` at the
+           cursor.  See |pibuf.picker.files()|.
+  `<C-s>`  Open the skills picker; on confirm insert `/skill:<name>` at the
+           cursor.  See |pibuf.picker.skills()|.
+
+To use different keys, remap them after pibuf loads — for example in a
+`FileType` autocmd for the `pi` filetype.
+
+================================================================================
+HIGHLIGHTS                                                    *pibuf-highlights*
+
+pibuf ships a syntax script for the `pi` filetype (`syntax/pi.vim`) that
+highlights the tokens the pickers insert. Override these groups in your color
+scheme to change their appearance.
+
+                                                                  *pibufFileRef*
+pibufFileRef  `@<path>` file mentions
+              Default: links to `Identifier`.
+
+                                                                    *pibufSkill*
+pibufSkill  `/skill:<name>` references
+            Default: links to `Function`.
+
+================================================================================
+API                                                                  *pibuf-api*
+
+                                                                 *pibuf.setup()*
+pibuf.setup() ~
+  Detect Pi's external-editor buffers and install the `<C-f>` / `<C-s>`
+  keymaps in `pi` buffers. Takes no options.
+
+  Repeated calls clear and re-register the autocmds, so handlers never stack.
+  lazy.nvim calls this automatically; you only need it when loading pibuf
+  without a plugin manager.
+
+                                                          *pibuf.picker.files()*
+require("pibuf.picker").files({buf}) ~
+  Open the snacks.nvim file picker scoped to the current working directory.
+  Confirming an item inserts `@<relpath>` at the cursor position captured
+  when the picker opened.
+
+  Parameters: ~
+    {buf} (`integer`) Target `pi` buffer.
+
+                                                         *pibuf.picker.skills()*
+require("pibuf.picker").skills({buf}) ~
+  Open the skills picker, built from |pibuf.skills.discover()|. Confirming a
+  skill inserts `/skill:<name>` at the cursor position captured when the
+  picker opened.
+
+  Parameters: ~
+    {buf} (`integer`) Target `pi` buffer.
+
+                                                       *pibuf.skills.discover()*
+require("pibuf.skills").discover({cwd}) ~
+  Discover every Pi skill reachable from a project directory, deduped by
+  name. Each `SKILL.md` must have a frontmatter `description` to be included.
+
+  Scans Pi's skill sources: ~
+    - User-global: `~/.agents/skills/*/SKILL.md`
+    - Project: `{cwd}/.agents/skills/*/SKILL.md`
+    - Config-dir: `~/.pi/agent/skills/` and `{cwd}/.pi/skills/` (also loose
+      `*.md`)
+    - Packages: `~/.pi/agent/npm/node_modules/*/skills/*/SKILL.md`
+
+  Parameters: ~
+    {cwd} (`string`) Project root to scan.
+
+  Return: ~
+    `pibuf.Skill[]` — entries are `{ name, description }` (both strings).
+
+                                              *pibuf.skills.parse_frontmatter()*
+require("pibuf.skills").parse_frontmatter({content}) ~
+  Parse the YAML-ish frontmatter block (`---` fences) at the top of a
+  `SKILL.md`. Supports plain and quoted scalars, plus block scalars (`|` /
+  `>`, with `-` / `+` chomping) folded to a single line.
+
+  Parameters: ~
+    {content} (`string?`) The file content.
+
+  Return: ~
+    `table<string,string>` Parsed `key = value` pairs; empty if no block.
+
+================================================================================
+TROUBLESHOOTING                                          *pibuf-troubleshooting*
+
+:checkhealth pibuf ~
+  Validate the setup. Reports:
+  - Whether Neovim >= 0.12 is installed.
+  - Whether snacks.nvim loads (required for the pickers).
+
+Common Issues: ~
+
+Pickers do nothing, or error about snacks.nvim ~
+- Install `folke/snacks.nvim` and add it to pibuf's `dependencies`.
+- Run `:checkhealth pibuf`; it tells you whether snacks.nvim is available.
+
+`Ctrl-G` opens Neovim but the keymaps are missing ~
+- Confirm the buffer filetype is `pi` (`:set ft?`). pibuf only activates on
+  `pi` buffers.
+- Make sure `$VISUAL` points at this Neovim, e.g.
+  `export VISUAL="env NVIM_APPNAME=lazyvim nvim"`.
+
+The skills picker is empty ~
+- Skills are read from `SKILL.md` files with a frontmatter `description`.
+  Add a `description:` field to a skill and reopen the picker.
 
 ================================================================================
 vim:tw=78:ts=8:et:ft=help:norl:

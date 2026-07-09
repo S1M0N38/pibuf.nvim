@@ -43,11 +43,12 @@ Install using [lazy.nvim](https://github.com/folke/lazy.nvim):
 {
   "S1M0N38/pibuf.nvim",
   dependencies = { "folke/snacks.nvim" },
+  opts = {},
 }
 ```
 
-pibuf activates automatically on the `pi` filetype — no `setup()` call needed
-(lazy.nvim auto-calls it).
+`opts = {}` lets lazy.nvim auto-call `setup()`, which registers the `pi`
+filetype detection and the picker keymaps. No manual `setup()` call needed.
 
 For development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -61,8 +62,3 @@ For development, see [CONTRIBUTING.md](CONTRIBUTING.md).
    original.
 
 Run `:checkhealth pibuf` to verify your setup.
-
-## 🙏 Acknowledgments
-
-Inspired by the `pi-nvim` prototype config. Pickers powered by
-[snacks.nvim](https://github.com/folke/snacks.nvim).

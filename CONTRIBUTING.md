@@ -1,6 +1,6 @@
 # Contributing to pibuf.nvim
 
-Thank you for your interest in contributing to pibuf.nvim! This template aims to provide a good foundation for Neovim plugin development.
+Thank you for your interest in contributing to pibuf.nvim!
 
 ## Getting Started
 
@@ -36,8 +36,10 @@ Tests auto-install their dependencies ([mini.test](https://github.com/echasnovsk
 | `make test-one MODULE=pibuf` | Run a single test file (`tests/pibuf_spec.lua`) |
 | `make lint` | Check formatting with StyLua (`--check`) |
 | `make format` | Auto-format Lua files with StyLua |
-| `make check` | Run lint + test |
+| `make typecheck` | Type-check Lua annotations with lua-language-server |
+| `make check` | Run lint + typecheck + test |
 | `make dev` | Launch Neovim with repro config for manual testing |
+| `make clean` | Remove `.repro` and `.tests` working directories |
 
 ## Writing Tests
 
@@ -47,9 +49,10 @@ Tests use [mini.test](https://github.com/echasnovski/mini.test) managed by [lazy
 
 ```
 tests/
-├── minit.lua         # Bootstrap entry point (lazy.minit)
-├── pibuf_spec.lua     # Plugin logic tests
-└── health_spec.lua   # Health check tests
+├── minit.lua          # Bootstrap entry point (lazy.minit)
+├── pibuf_spec.lua     # setup + filetype/keymap tests
+├── skills_spec.lua    # skill discovery + frontmatter parsing tests
+└── health_spec.lua    # health check tests
 ```
 
 ### Example test
@@ -58,11 +61,14 @@ tests/
 ---@module 'luassert'
 
 local pibuf = require("pibuf")
-pibuf.setup({})
 
-describe("default options", function()
-  it("hello() returns greeting with default name", function()
-    assert.are.equal("Hello John Doe", pibuf.hello())
+describe("setup", function()
+  it("is idempotent (autocmds don't stack)", function()
+    pibuf.setup()
+    local before = #vim.api.nvim_get_autocmds({ group = "pibuf" })
+    pibuf.setup()
+    local after = #vim.api.nvim_get_autocmds({ group = "pibuf" })
+    assert.are.equal(before, after)
   end)
 end)
 ```
@@ -129,10 +135,13 @@ git push origin feature/add-awesome-feature
 
 Two GitHub Actions workflows run automatically:
 
+Three GitHub Actions workflows run automatically:
+
 | Workflow | Trigger | Jobs |
 |----------|---------|------|
 | `ci.yml` | Push/PR to `main` | StyLua lint, lua-language-server typecheck, tests (stable + nightly) |
-| `release.yml` | Push to `main` | release-please (changelog + GitHub release), LuaRocks publish |
+| `release-github.yml` | Push to `main` | release-please (changelog + GitHub release) |
+| `release-luarocks.yml` | Push tag `v*.*.*` | LuaRocks publish |
 
 ## Bug Reports
 
@@ -144,8 +153,8 @@ When reporting bugs, please:
 
 ## Development Notes
 
-- **Template focus**: Remember this is a template — changes should benefit all plugin developers
+- **Scope**: pibuf is deliberately small — two pickers for the `pi` prompt buffer. Keep changes focused on that.
 - **Keep it simple**: Avoid adding complex dependencies or patterns
-- **Document everything**: Both code comments and help documentation
+- **Document everything**: Both LuaCATS annotations and `doc/pibuf.txt`
 
 Thank you for helping make pibuf.nvim better! 🚀
