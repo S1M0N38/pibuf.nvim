@@ -133,8 +133,6 @@ git push origin feature/add-awesome-feature
 
 ## CI
 
-Two GitHub Actions workflows run automatically:
-
 Three GitHub Actions workflows run automatically:
 
 | Workflow | Trigger | Jobs |
