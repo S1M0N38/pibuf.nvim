@@ -1,6 +1,5 @@
 <div align="center">
   <h1>≡&nbsp;&nbsp;pibuf.nvim&nbsp;&nbsp;≡</h1>
-
   <p align="center">
     <a href="https://github.com/S1M0N38/pibuf.nvim/actions/workflows/ci.yml">
       <img alt="CI badge" src="https://img.shields.io/github/actions/workflow/status/S1M0N38/pibuf.nvim/ci.yml?style=for-the-badge&label=CI"/>
@@ -12,12 +11,12 @@
       <img alt="GitHub badge" src="https://img.shields.io/github/v/release/S1M0N38/pibuf.nvim?style=for-the-badge&label=GitHub"/>
     </a>
   </p>
-  <p><em>Mininal nvim config for Pi agent Ctrl-G</em></p>
+  <div><video src="https://github.com/user-attachments/assets/dceeb95e-6d5e-4a41-a509-c5775fc5a455" alt="Screencast: pibuf.nvim example usage"></div>
+  <p><em>Mininal nvim config for Pi agent</em></p>
+  <hr>
 </div>
 
-______________________________________________________________________
-
-## 💡 Motivation
+## 💡 Idea
 
 When you press `Ctrl-G` in the [Pi coding agent](https://github.com/earendil-works/pi-coding-agent),
 Pi writes your prompt to a temp file and opens it in `$VISUAL`. pibuf.nvim
@@ -61,4 +60,4 @@ For development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 3. `:wq` / `ZZ` to send the edited prompt; `:cq` to cancel and keep the
    original.
 
-Run `:checkhealth pibuf` to verify your setup.
+Run `:checkhealth pibuf` to verify your setup. Read the full docs with `:help pibuf`.
