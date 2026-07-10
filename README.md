@@ -41,6 +41,7 @@ Install using [lazy.nvim](https://github.com/folke/lazy.nvim):
 ```lua
 {
   "S1M0N38/pibuf.nvim",
+  version = "1.*",
   dependencies = { "folke/snacks.nvim" },
   opts = {},
 }
