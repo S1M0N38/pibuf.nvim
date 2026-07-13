@@ -16,7 +16,18 @@ local plugins = {
     "S1M0N38/pibuf.nvim",
     dir = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h"),
     lazy = false,
-    opts = {},
+    dependencies = {
+      "folke/snacks.nvim",
+      -- "nvim-telescope/telescope.nvim",
+      -- "ibhagwan/fzf-lua",
+      -- "nvim-mini/mini.pick",
+    },
+    opts = {
+      picker = "snacks",
+      -- picker = "telescope",
+      -- picker = "fzf-lua",
+      -- picker = "mini.pick",
+    },
   },
 
   -- other plugins ...
