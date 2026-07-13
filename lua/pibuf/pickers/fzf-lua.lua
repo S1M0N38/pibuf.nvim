@@ -22,11 +22,22 @@ function M.files(cwd, on_select)
   if not ok then
     return
   end
+  local path = require("fzf-lua.path")
   fzf.files({
     cwd = cwd,
     actions = {
-      ["default"] = function(selected)
-        default_action(selected, on_select)
+      ["default"] = function(selected, opts)
+        if not selected or not selected[1] then
+          return
+        end
+        -- fzf-lua prefixes entries with git/file icons (and ANSI colors);
+        -- `entry_to_file` strips them and returns the clean path, so the icon
+        -- never leaks into the inserted `@<path>` mention.
+        local entry = path.entry_to_file(selected[1], opts)
+        local file = entry and entry.path
+        if file then
+          on_select(file)
+        end
       end,
     },
   })

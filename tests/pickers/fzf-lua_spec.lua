@@ -9,13 +9,18 @@ local adapter = require("pibuf.pickers.fzf-lua")
 local saved, captured
 
 before_each(function()
-  saved = package.loaded["fzf-lua"]
+  saved = {
+    ["fzf-lua"] = package.loaded["fzf-lua"],
+    ["fzf-lua.path"] = package.loaded["fzf-lua.path"],
+  }
   package.loaded["fzf-lua"] = nil
+  package.loaded["fzf-lua.path"] = nil
   captured = {}
 end)
 
 after_each(function()
-  package.loaded["fzf-lua"] = saved
+  package.loaded["fzf-lua"] = saved["fzf-lua"]
+  package.loaded["fzf-lua.path"] = saved["fzf-lua.path"]
   package.loaded["pibuf.pickers.fzf-lua"] = nil
 end)
 
@@ -25,17 +30,26 @@ describe("fzf-lua adapter", function()
       package.loaded["fzf-lua"] = {
         files = function(opts)
           captured.files_opts = opts
-          opts.actions["default"]({ "lua/pibuf/init.lua" })
+          opts.actions["default"]({ "icon lua/pibuf/init.lua" })
+        end,
+      }
+      -- `entry_to_file` strips the icon prefix fzf-lua adds to entries; the
+      -- adapter delegates to it and forwards `.path` to on_select.
+      package.loaded["fzf-lua.path"] = {
+        entry_to_file = function(entry)
+          captured.entry_arg = entry
+          return { path = "lua/pibuf/init.lua" }
         end,
       }
     end)
 
-    it("calls on_select with the selected file (relative to cwd)", function()
+    it("calls on_select with the icon-stripped path", function()
       local got
       adapter.files("/proj", function(path)
         got = path
       end)
       assert.are.equal("lua/pibuf/init.lua", got)
+      assert.are.equal("icon lua/pibuf/init.lua", captured.entry_arg)
     end)
 
     it("scopes files to cwd", function()
