@@ -192,6 +192,9 @@ describe("pickers dispatcher", function()
 
       pickers.files(buf)
 
+      vim.wait(1000, function()
+        return #notify_calls >= 1
+      end)
       assert.are.equal(1, #notify_calls)
       assert.are.equal(vim.log.levels.ERROR, notify_calls[1].level)
       assert.are.equal("unchanged", vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1])

@@ -32,11 +32,18 @@ local function require_adapter()
   local upstream = config.PICKERS[picker]
   local ok = pcall(require, upstream)
   if not ok then
-    vim.notify(
-      ("pibuf: picker %q is not installed. Install %s, or set a different picker in setup()."):format(picker, upstream),
-      vim.log.levels.ERROR,
-      { title = "pibuf.nvim" }
-    )
+    -- Scheduled so the notification never blocks the keymap that opened the
+    -- picker and is safe from any fast-event-loop caller.
+    vim.schedule(function()
+      vim.notify(
+        ("pibuf: picker %q is not installed. Install %s, or set a different picker in setup()."):format(
+          picker,
+          upstream
+        ),
+        vim.log.levels.ERROR,
+        { title = "pibuf.nvim" }
+      )
+    end)
     return nil
   end
   return require(M.MODULES[picker])
@@ -48,6 +55,10 @@ end
 ---@param col integer 0-indexed byte column
 ---@param text string
 local function insert_at(buf, row, col, text)
+  -- The pi buffer may have been deleted while an async picker was open.
+  if not vim.api.nvim_buf_is_valid(buf) then
+    return
+  end
   vim.api.nvim_buf_set_text(buf, row - 1, col, row - 1, col, { text })
   local win = vim.fn.bufwinid(buf)
   if win == -1 then
