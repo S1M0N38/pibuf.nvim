@@ -53,10 +53,22 @@ local function insert_at(buf, row, col, text)
   if win == -1 then
     return
   end
-  -- `a` appends after the inserted text's last char and enters insert mode,
-  -- landing the cursor past it in both mid-line and end-of-line cases.
-  vim.api.nvim_win_set_cursor(win, { row, col + #text - 1 })
-  vim.api.nvim_feedkeys("a", "n", false)
+  -- A synchronous picker (mini.pick) leaves the buffer in insert mode when
+  -- this scheduled callback runs. `stopinsert`'s <Esc>-like cursor shift is
+  -- applied only after this function returns, so a plain `nvim_win_set_cursor`
+  -- here (or even in a nested `vim.schedule`) gets clobbered and the cursor
+  -- lands before the trailing space. Feeding the steps as one typeahead stream
+  -- via <Cmd> makes them execute in order — `stopinsert` completes (with its
+  -- cursor shift) before `cursor()` overrides it — so `a` appends just past
+  -- the trailing space, in both mid-line and end-of-line cases. `stopinsert`
+  -- is a no-op for the async pickers, which already run here in normal mode.
+  local seq = string.format(
+    "<Cmd>stopinsert<CR><Cmd>lua pcall(vim.api.nvim_win_set_cursor, %d, {%d, %d})<CR>a",
+    win,
+    row,
+    col + #text - 1
+  )
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(seq, true, false, true), "n", false)
 end
 
 ---Open the file picker; insert `@<relpath>` at the cursor on confirm.
