@@ -75,8 +75,21 @@ function M.items(items, opts, on_select)
           local lines = vim.split(entry.preview or "", "\n", { plain = true })
           vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
           vim.bo[self.state.bufnr].filetype = "markdown"
+          -- telescope forces `wrap = false` on the preview window just before
+          -- calling define_preview; re-enable it so long skill descriptions
+          -- soft-wrap like the snacks adapter.
+          if self.state.winid then
+            vim.wo[self.state.winid].wrap = true
+          end
         end,
       }),
+      -- vertical layout mirrors snacks.nvim's `layout = "vertical"`: prompt +
+      -- results on top, markdown preview below. `preview_cutoff = 1` keeps
+      -- the preview visible even on narrow windows.
+      layout_strategy = "vertical",
+      layout_config = {
+        vertical = { preview_cutoff = 1, preview_height = 0.6 },
+      },
       sorter = conf.generic_sorter({}),
       attach_mappings = function(prompt_bufnr, _map)
         actions.select_default:replace(function()

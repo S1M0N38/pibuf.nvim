@@ -60,6 +60,16 @@ function M.items(items, opts, on_select)
     preview = function(args)
       return preview_map[args and args[1] or ""]
     end,
+    -- vertical layout mirrors snacks.nvim's `layout = "vertical"` (prompt +
+    -- results on top, preview below) and `wrap` soft-wraps long skill
+    -- descriptions, matching the snacks/telescope adapters.
+    winopts = {
+      preview = {
+        layout = "vertical",
+        vertical = "down:60%",
+        wrap = true,
+      },
+    },
   })
 end
 
