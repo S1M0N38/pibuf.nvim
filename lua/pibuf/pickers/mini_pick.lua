@@ -14,7 +14,13 @@ function M.files(cwd, on_select)
     return
   end
   local item = MiniPick.builtin.files({}, {
-    source = { cwd = cwd, name = " pibuf: @file " },
+    source = {
+      cwd = cwd,
+      name = " pibuf: @file ",
+      -- Override the default `choose` (which opens the file in the target
+      -- window) so picking only closes the picker and returns the path.
+      choose = function() end,
+    },
   })
   if item ~= nil then
     on_select(item)
@@ -41,6 +47,9 @@ function M.items(items, opts, on_select)
     source = {
       items = values,
       name = opts.title,
+      -- Override the default `choose` (which prints the item) so picking
+      -- only closes the picker and returns the value.
+      choose = function() end,
       preview = function(buf_id, entry)
         local lines = vim.split(preview_map[entry] or "", "\n", { plain = true })
         vim.api.nvim_buf_set_lines(buf_id, 0, -1, false, lines)
