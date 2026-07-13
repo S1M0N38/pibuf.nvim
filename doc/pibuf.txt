@@ -7,8 +7,8 @@ opens with `Ctrl-G`.
 When you press `Ctrl-G` in the Pi coding agent
 (https://github.com/earendil-works/pi-coding-agent), Pi writes your prompt to
 a temp file and opens it in `$VISUAL`. pibuf.nvim detects that buffer
-(filetype `pi`) and adds two buffer-local pickers powered by snacks.nvim
-(https://github.com/folke/snacks.nvim):
+(filetype `pi`) and adds two buffer-local pickers, backed by your choice of
+fuzzy-finder:
 
 - `<C-f>` — pick a project file; insert an `@<path>` mention.
 - `<C-s>` — pick an installed Pi skill; insert a `/skill:<name>` reference.
@@ -26,21 +26,23 @@ Table of contents:
 1. FEATURES: What this plugin provides.                         |pibuf-features|
 2. REQUIREMENTS: Plugin dependencies and setup.             |pibuf-requirements|
 3. INSTALLATION: How to install the plugin.                 |pibuf-installation|
-4. USAGE: Editing Pi prompts.                                      |pibuf-usage|
-5. KEYMAPS: Buffer-local keymaps in pi bu  ffers.                |pibuf-keymaps|
-6. HIGHLIGHTS: Syntax highlight groups.                       |pibuf-highlights|
-7. API: Public Lua functions.                                        |pibuf-api|
-8. TROUBLESHOOTING: Diagnosing problems.                 |pibuf-troubleshooting|
+4. CONFIGURATION: The picker option.                            |pibuf-config|
+5. USAGE: Editing Pi prompts.                                      |pibuf-usage|
+6. KEYMAPS: Buffer-local keymaps in pi buffers.                |pibuf-keymaps|
+7. HIGHLIGHTS: Syntax highlight groups.                       |pibuf-highlights|
+8. API: Public Lua functions.                                        |pibuf-api|
+9. TROUBLESHOOTING: Diagnosing problems.                 |pibuf-troubleshooting|
 
 ================================================================================
 FEATURES                                                        *pibuf-features*
 
-- File mentions: a `<C-f>` picker (snacks.nvim) scoped to the current working
-  directory inserts `@<relpath>` at the cursor.
+- File mentions: a `<C-f>` picker scoped to the current working directory
+  inserts `@<relpath>` at the cursor.
 - Skill references: a `<C-s>` picker built from a fresh scan of Pi's skill
   sources inserts `/skill:<name>` at the cursor.
-- Zero configuration: pibuf activates on the `pi` filetype and registers its
-  keymaps automatically — no options, no manual `setup()` call needed.
+- Picker choice: select the fuzzy-finder backend — snacks.nvim, telescope,
+  fzf-lua, or mini.pick, via the `picker` option (see |pibuf-config|).
+  No auto-detection; the active backend is always explicit.
 - Highlights: the `pi` filetype gets syntax highlighting for `@<path>` and
   `/skill:<name>` tokens (see |pibuf-highlights|).
 
@@ -48,8 +50,11 @@ FEATURES                                                        *pibuf-features*
 REQUIREMENTS                                                *pibuf-requirements*
 
 - Neovim >= 0.12
-- snacks.nvim (https://github.com/folke/snacks.nvim) — powers the file and
-  skills pickers.
+- One fuzzy-finder, set via |pibuf-config|. Any one of:
+  - snacks.nvim (https://github.com/folke/snacks.nvim) — the default
+  - telescope.nvim (https://github.com/nvim-telescope/telescope.nvim)
+  - fzf-lua (https://github.com/ibhagwan/fzf-lua)
+  - mini.pick (https://github.com/nvim-mini/mini.pick)
 - The Pi coding agent (https://github.com/earendil-works/pi-coding-agent),
   with `$VISUAL` pointing at this Neovim. For example: >
 
@@ -59,25 +64,59 @@ REQUIREMENTS                                                *pibuf-requirements*
 ================================================================================
 INSTALLATION                                                *pibuf-installation*
 
-Install with lazy.nvim (https://github.com/folke/lazy.nvim):
+Install with lazy.nvim (https://github.com/folke/lazy.nvim). Pick exactly one
+fuzzy-finder as the `dependency`, and match it with the |pibuf-config|
+`picker` option:
 
 >lua
   {
     "S1M0N38/pibuf.nvim",
     version = "1.*",
     dependencies = { "folke/snacks.nvim" },
-    opts = {},
+    opts = { picker = "snacks" },
   }
 <
 
-- `S1M0N38/pibuf.nvim`: the plugin's GitHub repository.
-- `dependencies`: `folke/snacks.nvim` powers the pickers (see
-  |pibuf-requirements|).
+- `dependencies`: one fuzzy-finder (see |pibuf-requirements|). It must match
+  the `picker` you set below.
+- `opts`: forwarded to |pibuf.setup()|. `picker` selects the backend.
 
-pibuf has no options of its own. The empty `opts = {}` above just tells
-lazy.nvim to auto-call `require("pibuf").setup()`, which registers the
-autocmds that detect `pi` buffers; see |pibuf.setup()|. No manual `setup()`
-call is required.
+`opts = {}` lets lazy.nvim auto-call `setup()`, which registers the `pi`
+filetype detection and the picker keymaps. No manual `setup()` call is
+required; the default `picker` is `"snacks"`.
+
+================================================================================
+CONFIGURATION                                                    *pibuf-config*
+
+pibuf has a single option: which fuzzy-finder to use.
+
+                                                              *pibuf.setup()*
+pibuf.setup({opts}) ~
+  Detect Pi's external-editor buffers and install the `<C-f>` / `<C-s>`
+  keymaps in `pi` buffers. Repeated calls clear and re-register the autocmds,
+  so handlers never stack.
+
+  Parameters: ~
+    {opts} (`table?`) Options table:
+      • `picker` (`string`, default: `"snacks"`) — one of `"snacks"`,
+        `"telescope"`, `"fzf-lua"`, `"mini.pick"`. An unknown value raises a
+        hard error at setup.
+
+>lua
+  require("pibuf").setup({
+    picker = "snacks", -- one of: snacks, telescope, fzf-lua, mini.pick
+  })
+<
+
+Validation is split across two layers:
+- At `setup()`: the `picker` value is checked against the supported enum; a
+  typo is a hard error.
+- At runtime: whether the chosen picker's upstream plugin is installed is
+  checked by `:checkhealth pibuf` (warn) and again when a picker opens
+  (`vim.notify` + bail), so lazy-load ordering is never a problem.
+
+The supported set is defined by `require("pibuf.config").PICKERS` (see
+|pibuf.config.PICKERS|).
 
 ================================================================================
 USAGE                                                              *pibuf-usage*
@@ -101,9 +140,9 @@ shadow your global mappings. They are active in Normal and Insert mode.
 Default keymaps: ~
 
   `<C-f>`  Open the file picker; on confirm insert `@<relpath>` at the
-           cursor.  See |pibuf.picker.files()|.
+           cursor.  See |pibuf.pickers.files()|.
   `<C-s>`  Open the skills picker; on confirm insert `/skill:<name>` at the
-           cursor.  See |pibuf.picker.skills()|.
+           cursor.  See |pibuf.pickers.skills()|.
 
 To use different keys, remap them after pibuf loads — for example in a
 `FileType` autocmd for the `pi` filetype.
@@ -126,26 +165,23 @@ pibufSkill  `/skill:<name>` references
 ================================================================================
 API                                                                  *pibuf-api*
 
-                                                                 *pibuf.setup()*
-pibuf.setup() ~
-  Detect Pi's external-editor buffers and install the `<C-f>` / `<C-s>`
-  keymaps in `pi` buffers. Takes no options.
+                                                          *pibuf.config.PICKERS*
+require("pibuf.config").PICKERS ~
+  The supported-picker enum: a map from picker name to its upstream `require`
+  name. The keys are the valid values for the |pibuf-config| `picker` option:
+  `snacks`, `telescope`, `fzf-lua`, `mini.pick`.
 
-  Repeated calls clear and re-register the autocmds, so handlers never stack.
-  lazy.nvim calls this automatically; you only need it when loading pibuf
-  without a plugin manager.
-
-                                                          *pibuf.picker.files()*
-require("pibuf.picker").files({buf}) ~
-  Open the snacks.nvim file picker scoped to the current working directory.
-  Confirming an item inserts `@<relpath>` at the cursor position captured
-  when the picker opened.
+                                                       *pibuf.pickers.files()*
+require("pibuf.pickers").files({buf}) ~
+  Open the configured picker's file finder scoped to the current working
+  directory. Confirming an item inserts `@<relpath>` at the cursor position
+  captured when the picker opened.
 
   Parameters: ~
     {buf} (`integer`) Target `pi` buffer.
 
-                                                         *pibuf.picker.skills()*
-require("pibuf.picker").skills({buf}) ~
+                                                      *pibuf.pickers.skills()*
+require("pibuf.pickers").skills({buf}) ~
   Open the skills picker, built from |pibuf.skills.discover()|. Confirming a
   skill inserts `/skill:<name>` at the cursor position captured when the
   picker opened.
@@ -189,13 +225,16 @@ TROUBLESHOOTING                                          *pibuf-troubleshooting*
 :checkhealth pibuf ~
   Validate the setup. Reports:
   - Whether Neovim >= 0.12 is installed.
-  - Whether snacks.nvim loads (required for the pickers).
+  - Whether the configured picker (see |pibuf-config|) loads. A missing
+    picker is a warning, not an error — install it and the pickers activate.
 
 Common Issues: ~
 
-Pickers do nothing, or error about snacks.nvim ~
-- Install `folke/snacks.nvim` and add it to pibuf's `dependencies`.
-- Run `:checkhealth pibuf`; it tells you whether snacks.nvim is available.
+Pickers do nothing, or notify that the picker is not installed ~
+- Set `picker` to a backend you have installed (see |pibuf-config|) and add
+  that backend to pibuf's `dependencies`.
+- Run `:checkhealth pibuf`; it names the configured picker and lists the
+  supported set.
 
 `Ctrl-G` opens Neovim but the keymaps are missing ~
 - Confirm the buffer filetype is `pi` (`:set ft?`). pibuf only activates on

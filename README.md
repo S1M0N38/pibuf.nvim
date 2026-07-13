@@ -25,12 +25,10 @@ detects that buffer (filetype `pi`) and adds two buffer-local pickers:
 - **`<C-f>`** — pick a project file and insert an `@<path>` mention.
 - **`<C-s>`** — pick an installed Pi skill and insert a `/skill:<name>` reference.
 
-Pickers are powered by [snacks.nvim](https://github.com/folke/snacks.nvim).
-
 ## ⚡ Requirements
 
 - Neovim >= 0.12
-- [snacks.nvim](https://github.com/folke/snacks.nvim)
+- [snacks.nvim](https://github.com/folke/snacks.nvim), [telescope](https://github.com/nvim-telescope/telescope.nvim), [fzf-lua](https://github.com/ibhagwan/fzf-lua) or [mini.pick](https://github.com/nvim-mini/mini.pick)
 - Pi, with `$VISUAL` pointing at Neovim, e.g.
   `export VISUAL="env NVIM_APPNAME=nvim nvim"`
 
@@ -42,8 +40,18 @@ Install using [lazy.nvim](https://github.com/folke/lazy.nvim):
 {
   "S1M0N38/pibuf.nvim",
   version = "1.*",
-  dependencies = { "folke/snacks.nvim" },
-  opts = {},
+  dependencies = {
+    "folke/snacks.nvim",
+    -- "nvim-telescope/telescope.nvim",
+    -- "ibhagwan/fzf-lua",
+    -- "nvim-mini/mini.pick",
+  },
+  opts = {
+    picker = "snacks",
+    -- picker = "telescope",
+    -- picker = "fzf-lua",
+    -- picker = "mini.pick",
+  },
 }
 ```
 

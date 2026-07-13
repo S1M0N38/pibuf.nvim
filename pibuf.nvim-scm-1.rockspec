@@ -12,9 +12,9 @@ description = {
 	detailed = [[
 pibuf.nvim auto-activates when the Pi coding agent opens Neovim via Ctrl-G
 and adds two buffer-local pickers to the prompt buffer: <C-f> inserts an
-@<path> file mention via a snacks.nvim file picker, and <C-s> inserts a
-/skill:<name> reference via a skills picker built from a scan of Pi's skill
-sources.
+@<path> file mention, and <C-s> inserts a /skill:<name> reference built from
+a scan of Pi's skill sources. The fuzzy-finder backend is chosen with the
+`picker` option: snacks.nvim (default), telescope.nvim, fzf-lua, or mini.pick.
   ]],
 	labels = { "neovim", "plugin", "pi", "prompt", "picker" },
 	homepage = "https://github.com/" .. user .. "/" .. package,
