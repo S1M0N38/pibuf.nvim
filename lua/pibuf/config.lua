@@ -16,12 +16,22 @@ M.PICKERS = {
 M.picker = "snacks"
 
 ---Validate and apply user options.
+---An unknown `picker` is a soft error: an ERROR notification is scheduled and
+---the previously-configured (default `"snacks"`) picker is kept, so a typo
+---never stops the plugin from loading.
 ---@param opts? { picker?: string }
 function M.setup(opts)
   opts = opts or {}
   local p = opts.picker
   if p ~= nil and M.PICKERS[p] == nil then
-    error(("pibuf: unknown picker %q (want one of snacks, telescope, fzf-lua, mini.pick)"):format(p))
+    vim.schedule(function()
+      vim.notify(
+        ("pibuf: unknown picker %q (want one of snacks, telescope, fzf-lua, mini.pick); keeping %q"):format(p, M.picker),
+        vim.log.levels.ERROR,
+        { title = "pibuf.nvim" }
+      )
+    end)
+    return
   end
   if p then
     M.picker = p

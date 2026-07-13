@@ -30,15 +30,43 @@ describe("config", function()
       end)
     end
 
-    it("errors on an unknown picker", function()
-      assert.has_error(function()
-        config.setup({ picker = "fzf" })
-      end, 'pibuf: unknown picker "fzf" (want one of snacks, telescope, fzf-lua, mini.pick)')
-    end)
+    describe("invalid picker", function()
+      local saved_notify, notify_calls
 
-    it("errors on a typo", function()
-      assert.has_error(function()
+      before_each(function()
+        saved_notify = vim.notify
+        notify_calls = {}
+        vim.notify = function(msg, level, opts)
+          notify_calls[#notify_calls + 1] = { msg = msg, level = level, opts = opts }
+        end
+      end)
+
+      after_each(function()
+        vim.notify = saved_notify
+      end)
+
+      it("notifies ERROR and keeps the previous picker (unknown name)", function()
+        config.picker = "snacks"
+        config.setup({ picker = "fzf" })
+        vim.wait(1000, function()
+          return #notify_calls >= 1
+        end)
+        assert.are.equal(1, #notify_calls)
+        assert.are.equal(vim.log.levels.ERROR, notify_calls[1].level)
+        assert.matches('unknown picker "fzf"', notify_calls[1].msg)
+        assert.matches("keeping", notify_calls[1].msg)
+        assert.are.equal("snacks", config.picker)
+      end)
+
+      it("notifies ERROR and keeps the previous picker (typo)", function()
+        config.picker = "telescope"
         config.setup({ picker = "snakcs" })
+        vim.wait(1000, function()
+          return #notify_calls >= 1
+        end)
+        assert.are.equal(1, #notify_calls)
+        assert.are.equal(vim.log.levels.ERROR, notify_calls[1].level)
+        assert.are.equal("telescope", config.picker)
       end)
     end)
   end)

@@ -99,8 +99,8 @@ pibuf.setup({opts}) ~
   Parameters: ~
     {opts} (`table?`) Options table:
       • `picker` (`string`, default: `"snacks"`) — one of `"snacks"`,
-        `"telescope"`, `"fzf-lua"`, `"mini.pick"`. An unknown value raises a
-        hard error at setup.
+        `"telescope"`, `"fzf-lua"`, `"mini.pick"`. An unknown value schedules
+        an ERROR notification and keeps the previous picker (no hard error).
 
 >lua
   require("pibuf").setup({
@@ -110,7 +110,8 @@ pibuf.setup({opts}) ~
 
 Validation is split across two layers:
 - At `setup()`: the `picker` value is checked against the supported enum; a
-  typo is a hard error.
+  typo schedules an ERROR notification and keeps the previous picker, so the
+  plugin still loads.
 - At runtime: whether the chosen picker's upstream plugin is installed is
   checked by `:checkhealth pibuf` (warn) and again when a picker opens
   (`vim.notify` + bail), so lazy-load ordering is never a problem.
