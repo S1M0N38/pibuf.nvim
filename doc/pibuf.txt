@@ -1,5 +1,5 @@
 ================================================================================
-INTRODUCTION                                                             *pibuf*
+INTRODUCTION                                                            *pibuf*
 
 pibuf.nvim — Picker-backed prompt editing for the buffer the Pi coding agent
 opens with `Ctrl-G`.
@@ -23,18 +23,18 @@ Links:
 
 Table of contents:
 
-1. FEATURES: What this plugin provides.                         |pibuf-features|
-2. REQUIREMENTS: Plugin dependencies and setup.             |pibuf-requirements|
-3. INSTALLATION: How to install the plugin.                 |pibuf-installation|
-4. CONFIGURATION: The picker option.                            |pibuf-config|
-5. USAGE: Editing Pi prompts.                                      |pibuf-usage|
-6. KEYMAPS: Buffer-local keymaps in pi buffers.                |pibuf-keymaps|
-7. HIGHLIGHTS: Syntax highlight groups.                       |pibuf-highlights|
-8. API: Public Lua functions.                                        |pibuf-api|
-9. TROUBLESHOOTING: Diagnosing problems.                 |pibuf-troubleshooting|
+1. FEATURES: What this plugin provides.                        |pibuf-features|
+2. REQUIREMENTS: Plugin dependencies and setup.            |pibuf-requirements|
+3. INSTALLATION: How to install the plugin.                |pibuf-installation|
+4. CONFIGURATION: The picker option.                             |pibuf-config|
+5. USAGE: Editing Pi prompts.                                     |pibuf-usage|
+6. KEYMAPS: Buffer-local keymaps in pi buffers.                 |pibuf-keymaps|
+7. HIGHLIGHTS: Syntax highlight groups.                      |pibuf-highlights|
+8. API: Public Lua functions.                                       |pibuf-api|
+9. TROUBLESHOOTING: Diagnosing problems.                |pibuf-troubleshooting|
 
 ================================================================================
-FEATURES                                                        *pibuf-features*
+FEATURES                                                       *pibuf-features*
 
 - File mentions: a `<C-f>` picker scoped to the current working directory
   inserts `@<relpath>` at the cursor.
@@ -47,7 +47,7 @@ FEATURES                                                        *pibuf-features*
   `/skill:<name>` tokens (see |pibuf-highlights|).
 
 ================================================================================
-REQUIREMENTS                                                *pibuf-requirements*
+REQUIREMENTS                                               *pibuf-requirements*
 
 - Neovim >= 0.12
 - One fuzzy-finder, set via |pibuf-config|. Any one of:
@@ -62,7 +62,7 @@ REQUIREMENTS                                                *pibuf-requirements*
 <
 
 ================================================================================
-INSTALLATION                                                *pibuf-installation*
+INSTALLATION                                               *pibuf-installation*
 
 Install with lazy.nvim (https://github.com/folke/lazy.nvim). Pick exactly one
 fuzzy-finder as the `dependency`, and match it with the |pibuf-config|
@@ -72,8 +72,18 @@ fuzzy-finder as the `dependency`, and match it with the |pibuf-config|
   {
     "S1M0N38/pibuf.nvim",
     version = "1.*",
-    dependencies = { "folke/snacks.nvim" },
-    opts = { picker = "snacks" },
+    dependencies = {
+      "folke/snacks.nvim",
+      -- "nvim-telescope/telescope.nvim",
+      -- "ibhagwan/fzf-lua",
+      -- "nvim-mini/mini.pick",
+    },
+    opts = {
+      picker = "snacks",
+      -- picker = "telescope",
+      -- picker = "fzf-lua",
+      -- picker = "mini.pick",
+    },
   }
 <
 
@@ -90,7 +100,7 @@ CONFIGURATION                                                    *pibuf-config*
 
 pibuf has a single option: which fuzzy-finder to use.
 
-                                                              *pibuf.setup()*
+                                                                *pibuf.setup()*
 pibuf.setup({opts}) ~
   Detect Pi's external-editor buffers and install the `<C-f>` / `<C-s>`
   keymaps in `pi` buffers. Repeated calls clear and re-register the autocmds,
@@ -120,7 +130,7 @@ The supported set is defined by `require("pibuf.config").PICKERS` (see
 |pibuf.config.PICKERS|).
 
 ================================================================================
-USAGE                                                              *pibuf-usage*
+USAGE                                                             *pibuf-usage*
 
 1. Press `Ctrl-G` in Pi. Pi writes your prompt to a temp file and opens it in
    Neovim; pibuf sets the filetype to `pi`, jumps to the end of the prompt,
@@ -133,7 +143,7 @@ USAGE                                                              *pibuf-usage*
    `:cq` (exit code non-zero).
 
 ================================================================================
-KEYMAPS                                                          *pibuf-keymaps*
+KEYMAPS                                                         *pibuf-keymaps*
 
 Both keymaps are buffer-local: they are set only in `pi` buffers and never
 shadow your global mappings. They are active in Normal and Insert mode.
@@ -149,30 +159,30 @@ To use different keys, remap them after pibuf loads — for example in a
 `FileType` autocmd for the `pi` filetype.
 
 ================================================================================
-HIGHLIGHTS                                                    *pibuf-highlights*
+HIGHLIGHTS                                                   *pibuf-highlights*
 
 pibuf ships a syntax script for the `pi` filetype (`syntax/pi.vim`) that
 highlights the tokens the pickers insert. Override these groups in your color
 scheme to change their appearance.
 
-                                                                  *pibufFileRef*
+                                                                 *pibufFileRef*
 pibufFileRef  `@<path>` file mentions
               Default: links to `Identifier`.
 
-                                                                    *pibufSkill*
+                                                                   *pibufSkill*
 pibufSkill  `/skill:<name>` references
             Default: links to `Function`.
 
 ================================================================================
-API                                                                  *pibuf-api*
+API                                                                 *pibuf-api*
 
-                                                          *pibuf.config.PICKERS*
+                                                         *pibuf.config.PICKERS*
 require("pibuf.config").PICKERS ~
   The supported-picker enum: a map from picker name to its upstream `require`
   name. The keys are the valid values for the |pibuf-config| `picker` option:
   `snacks`, `telescope`, `fzf-lua`, `mini.pick`.
 
-                                                       *pibuf.pickers.files()*
+                                                        *pibuf.pickers.files()*
 require("pibuf.pickers").files({buf}) ~
   Open the configured picker's file finder scoped to the current working
   directory. Confirming an item inserts `@<relpath>` at the cursor position
@@ -181,7 +191,7 @@ require("pibuf.pickers").files({buf}) ~
   Parameters: ~
     {buf} (`integer`) Target `pi` buffer.
 
-                                                      *pibuf.pickers.skills()*
+                                                       *pibuf.pickers.skills()*
 require("pibuf.pickers").skills({buf}) ~
   Open the skills picker, built from |pibuf.skills.discover()|. Confirming a
   skill inserts `/skill:<name>` at the cursor position captured when the
@@ -190,7 +200,7 @@ require("pibuf.pickers").skills({buf}) ~
   Parameters: ~
     {buf} (`integer`) Target `pi` buffer.
 
-                                                       *pibuf.skills.discover()*
+                                                      *pibuf.skills.discover()*
 require("pibuf.skills").discover({cwd}) ~
   Discover every Pi skill reachable from a project directory, deduped by
   name. Each `SKILL.md` must have a frontmatter `description` to be included.
@@ -208,7 +218,7 @@ require("pibuf.skills").discover({cwd}) ~
   Return: ~
     `pibuf.Skill[]` — entries are `{ name, description }` (both strings).
 
-                                              *pibuf.skills.parse_frontmatter()*
+                                             *pibuf.skills.parse_frontmatter()*
 require("pibuf.skills").parse_frontmatter({content}) ~
   Parse the YAML-ish frontmatter block (`---` fences) at the top of a
   `SKILL.md`. Supports plain and quoted scalars, plus block scalars (`|` /
@@ -221,7 +231,7 @@ require("pibuf.skills").parse_frontmatter({content}) ~
     `table<string,string>` Parsed `key = value` pairs; empty if no block.
 
 ================================================================================
-TROUBLESHOOTING                                          *pibuf-troubleshooting*
+TROUBLESHOOTING                                         *pibuf-troubleshooting*
 
 :checkhealth pibuf ~
   Validate the setup. Reports:
