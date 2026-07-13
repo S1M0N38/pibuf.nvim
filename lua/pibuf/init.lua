@@ -1,8 +1,10 @@
 -- pibuf.nvim: picker-backed prompt editing for the Pi coding agent.
 -- Detects Pi's external-editor temp files (filetype `pi`) and installs two
--- buffer-local pickers powered by snacks.nvim.
+-- buffer-local pickers (file @mention and /skill: reference).
 
 local M = {}
+
+local config = require("pibuf.config")
 
 local augroup = vim.api.nvim_create_augroup("pibuf", { clear = true })
 
@@ -37,19 +39,21 @@ local function activate()
     group = augroup,
     pattern = "pi",
     callback = function(args)
-      local Picker = require("pibuf.picker")
+      local pickers = require("pibuf.pickers")
       vim.keymap.set({ "i", "n" }, "<C-f>", function()
-        Picker.files(args.buf)
+        pickers.files(args.buf)
       end, { buffer = args.buf, silent = true, desc = "pibuf: insert @file" })
       vim.keymap.set({ "i", "n" }, "<C-s>", function()
-        Picker.skills(args.buf)
+        pickers.skills(args.buf)
       end, { buffer = args.buf, silent = true, desc = "pibuf: insert /skill:" })
     end,
   })
 end
 
 ---Detect `pi` buffers and install the picker keymaps.
-function M.setup()
+---@param opts? { picker?: string }
+function M.setup(opts)
+  config.setup(opts)
   activate()
 end
 

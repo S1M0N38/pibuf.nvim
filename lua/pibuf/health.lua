@@ -1,5 +1,7 @@
 local M = {}
 
+local config = require("pibuf.config")
+
 ---Health check called by `:checkhealth pibuf`.
 function M.check()
   vim.health.start("pibuf.nvim")
@@ -10,10 +12,19 @@ function M.check()
     vim.health.error("Neovim >= 0.12 is required")
   end
 
-  if pcall(require, "snacks") then
-    vim.health.ok("snacks.nvim found — file/skill pickers available")
+  -- The picker enum is validated at setup(); here we only confirm the chosen
+  -- upstream is installed. Warn (not error): the user may install it later.
+  local picker = config.picker
+  local upstream = config.PICKERS[picker]
+  local supported = vim.tbl_keys(config.PICKERS)
+  table.sort(supported)
+  if pcall(require, upstream) then
+    vim.health.ok(("configured picker '%s' found — file/skill pickers available"):format(picker))
   else
-    vim.health.error("snacks.nvim not found — pickers disabled. Install folke/snacks.nvim.")
+    vim.health.warn(
+      ("configured picker '%s' not found — pickers disabled"):format(picker),
+      ("install %s (supported: %s)"):format(upstream, table.concat(supported, ", "))
+    )
   end
 end
 
